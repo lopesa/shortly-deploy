@@ -38,6 +38,7 @@
 // });
 
 // module.exports = db;
+var crypto = require('crypto');
 
 
 var mongoose = require('mongoose');
@@ -46,16 +47,71 @@ mongoose.connect('mongodb://localhost/shortly');
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  // we're connected!
-  console.log('listening on 27017');
+// db.once('open', function() {
+//   // we're connected!
+//   console.log('listening on 27017');
+  
+//   // if exists... (?)
 
 
+db.userSchema = new mongoose.Schema({
+  username: String,
+  password: String
+});
 
+db.linkSchema = new mongoose.Schema({
+  url: String,
+  baseUrl: String,
+  code: String,
+  title: String,
+  visits: Number
+  // plus method for increasing visits? Or handle that elsewhere?
+});
+
+
+db.linkSchema.pre('save', function(next) {
+  // do stuff
+  // console.log('INSIDE PRE SAVE');
+  console.log('this', this);
+  // console.log('next', next);
+  // console.log(arguments);
+
+
+  var shasum = crypto.createHash('sha1');
+  shasum.update(this.url);
+  var shaCode = shasum.digest('hex').slice(0, 5);
+
+  this.code = shaCode;
+  // this.update({ code: shaCode }, function (err, raw) {
+  //   if (err) {
+  //     return console.log(err);
+  //   }
+  //   // console.log('THIS ==>', context);
+  //   console.log('The raw response from Mongo was ', raw);
+  
+  next();
+
+  
+  
+
+  // console.log("the code is generated: ", shasum.digest('hex').slice(0, 5));
+  
+
+  // this.code = shasum.digest('hex').slice(0, 5);
 
 });
 
-module.exports = db;
+var User = mongoose.model('User', db.userSchema);
+var Link = mongoose.model('Link', db.linkSchema);
+
+
+
+
+module.exports = {
+  db: db,
+  User: User,
+  Link: Link
+};
 
 
 
