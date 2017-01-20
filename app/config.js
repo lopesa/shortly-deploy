@@ -70,39 +70,42 @@ db.linkSchema = new mongoose.Schema({
 
 
 db.linkSchema.pre('save', function(next) {
-  // do stuff
-  // console.log('INSIDE PRE SAVE');
-  console.log('this', this);
-  // console.log('next', next);
-  // console.log(arguments);
-
-
   var shasum = crypto.createHash('sha1');
   shasum.update(this.url);
   var shaCode = shasum.digest('hex').slice(0, 5);
 
-  this.code = shaCode;
-  // this.update({ code: shaCode }, function (err, raw) {
-  //   if (err) {
-  //     return console.log(err);
-  //   }
-  //   // console.log('THIS ==>', context);
-  //   console.log('The raw response from Mongo was ', raw);
-  
+  this.code = shaCode;  
   next();
-
-  
-  
-
-  // console.log("the code is generated: ", shasum.digest('hex').slice(0, 5));
-  
-
-  // this.code = shasum.digest('hex').slice(0, 5);
-
 });
+
+
+
+// db.userSchema.pre('save', function(next) {
+//   this.hashPassword();
+
+//   next();
+
+// });
 
 var User = mongoose.model('User', db.userSchema);
 var Link = mongoose.model('Link', db.linkSchema);
+
+User.hashPassword = function(unencryptedPassword) {
+  var cipher = Promise.promisify(bcrypt.hash);
+
+  cipher(unencryptedPassword).then(function(hash) {
+    this.password = hash;
+  });
+
+  // next();
+  
+
+  // return cipher(this.get('password'), null, null).bind(this)
+  //   .then(function(hash) {
+
+    // });
+
+};
 
 
 

@@ -15,13 +15,13 @@ var mongoose = require('mongoose');
 //       callback(isMatch);
 //     });
 //   },
-//   hashPassword: function() {
-//     var cipher = Promise.promisify(bcrypt.hash);
-//     return cipher(this.get('password'), null, null).bind(this)
-//       .then(function(hash) {
-//         this.set('password', hash);
-//       });
-//   }
+  // hashPassword: function() {
+  //   var cipher = Promise.promisify(bcrypt.hash);
+  //   return cipher(this.get('password'), null, null).bind(this)
+  //     .then(function(hash) {
+  //       this.set('password', hash);
+  //     });
+  // }
 // });
 var User = mongoose.model('User', db.userSchema);
 
